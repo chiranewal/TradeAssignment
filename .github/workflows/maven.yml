@@ -29,3 +29,15 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
+
+    - name: Run OWASP Dependency-Check
+      run: mvn verify
+
+    - name: Check OWASP results
+      if: always()
+      run: |
+        if grep -q 'VULNERABILITY FOUND' target/dependency-check-report.html; then
+          echo "Critical vulnerabilities found in dependencies - aborting"
+          exit 1
+        fi
